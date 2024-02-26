@@ -5,38 +5,34 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
 
-class ChatAdapter(private val messages: List<ChatMessage>) : RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_chat_message, parent, false)
-        return ChatViewHolder(view)
+class ChatAdapter(var list: ArrayList<MessageData> ): RecyclerView.Adapter<ChatAdapter.ViewHolderClass>() {
+    inner class ViewHolderClass(var view: View): RecyclerView.ViewHolder(view){
+        var tvMessage = view.findViewById<TextView>(R.id.tvMessage)
+        var tvTime = view.findViewById<TextView>(R.id.tvTime)
     }
-
-    override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-        val message = messages[position]
-        holder.bind(message)
-    }
-
-    override fun getItemCount(): Int = messages.size
-
-    inner class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val messageTextView: TextView = itemView.findViewById(R.id.message_text_view)
-        private val timeTextView: TextView = itemView.findViewById(R.id.time_text_view)
-
-        fun bind(message: ChatMessage) {
-            messageTextView.text = message.message
-            timeTextView.text = message.time
-
-            val params = messageTextView.layoutParams as ViewGroup.MarginLayoutParams
-            if (message.position == Position.FIRST) {
-                params.marginStart = 0
-                params.marginEnd = itemView.resources.getDimensionPixelOffset(R.dimen.message_end_margin)
-            } else {
-                params.marginStart = itemView.resources.getDimensionPixelOffset(R.dimen.message_end_margin)
-                params.marginEnd = 0
-            }
-            messageTextView.layoutParams = params
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatAdapter.ViewHolderClass {
+        var view : View
+        if (viewType == 0){
+            view = LayoutInflater.from(parent.context).inflate(R.layout.rightmsg,parent,false)
+        }else{
+            view = LayoutInflater.from(parent.context).inflate(R.layout.leftmsg,parent,false)
         }
+        return ViewHolderClass(view)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (list[position].id == 0){
+            0
+        }else 1
+    }
+    override fun onBindViewHolder(holder: ChatAdapter.ViewHolderClass, position: Int) {
+        holder.tvMessage.setText(list[position].message)
+        holder.tvTime.setText(SimpleDateFormat("hh:mm").format(list[position].dateTime.time))
+    }
+
+    override fun getItemCount(): Int {
+        return list.size
     }
 }
